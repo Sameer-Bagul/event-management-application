@@ -31,7 +31,6 @@ const populateEvent = (query: any) => {
 export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
     await connectToDatabase()
-
     const organizer = await User.findById(userId)
     if (!organizer) throw new Error('Organizer not found')
 
@@ -40,6 +39,13 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
 
     return JSON.parse(JSON.stringify(newEvent))
   } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error creating event:', error.message) // Log the error message
+      console.error('Stack trace:', error.stack) // Log the stack trace
+      console.error('Error details:', error) // Log the full error object
+    } else {
+      console.error('Unknown error:', error)
+    }
     handleError(error)
   }
 }
@@ -82,7 +88,6 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   }
 }
 
-// DELETE
 export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   try {
     await connectToDatabase()

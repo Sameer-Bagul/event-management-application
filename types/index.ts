@@ -144,7 +144,7 @@ export type CreateUserParams = {
   }
   
   export type SearchParamProps = {
-    params: { id: string }
-    searchParams: { [key: string]: string | string[] | undefined }
+    Params : Promise<{ slug: string }>
+    SearchParams : Promise<{ [key: string]: string | string[] | undefined }>
   }
   
