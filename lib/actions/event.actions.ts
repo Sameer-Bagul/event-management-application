@@ -148,14 +148,26 @@ export async function getAllEvents({
 
 // GET EVENTS BY ORGANIZER
 export async function getEventsByUser({
-  userId,
+  userId, // This is Clerk's userId (clerkId)
   limit = 6,
   page,
 }: GetEventsByUserParams) {
   try {
+    console.log('Received userId:', userId); // Log to verify the userId
+
     await connectToDatabase();
 
-    const conditions = { organizer: userId };
+    // Query the database using clerkId (not clerkUserId)
+    const user = await User.findOne({ clerkId: userId }); // Ensure clerkId is used in query
+    if (!user) {
+      console.error('User not found in the database for userId:', userId); // Log error
+      throw new Error("User not found in the database");
+    }
+
+    const objectIdUser = user._id; // MongoDB ObjectId of the user
+
+    // Query events with the MongoDB ObjectId
+    const conditions = { organizer: objectIdUser };
     const skipAmount = (page - 1) * limit;
 
     const eventsQuery = Event.find(conditions)
@@ -163,7 +175,7 @@ export async function getEventsByUser({
       .skip(skipAmount)
       .limit(limit);
 
-    const events = await populateEvent(eventsQuery);
+    const events = await eventsQuery.populate("category").populate("organizer");
     const eventsCount = await Event.countDocuments(conditions);
 
     return {
@@ -174,6 +186,8 @@ export async function getEventsByUser({
     handleError(error);
   }
 }
+
+
 
 // GET RELATED EVENTS: EVENTS WITH SAME CATEGORY
 export async function getRelatedEventsByCategory({

@@ -10,13 +10,28 @@ import { handleError } from "@/lib/utils";
 
 import { CreateUserParams, UpdateUserParams } from "@/types";
 
-export async function createUser(user: CreateUserParams) {
+export async function createUser(params: CreateUserParams) {
   try {
+    const { username, ...otherParams } = params;
+
+    if (!username) {
+      throw new Error("Username cannot be null");
+    }
+
     await connectToDatabase();
-    const newUser = await User.create(user);
-    return JSON.parse(JSON.stringify(newUser));
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      throw new Error("Username already exists");
+    }
+
+    const newUser = new User({ username, ...otherParams });
+    await newUser.save();
+    revalidatePath("/users");
+    return newUser;
   } catch (error) {
-    console.error("create user fail due to ", error);
+    handleError(error);
+    throw error;
   }
 }
 
@@ -47,26 +62,25 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
 }
 
 export async function deleteUser(clerkId: string) {
-    try {
-      await connectToDatabase()
-      const userToDelete = await User.findOne({ clerkId })
-  
-      if (!userToDelete) {
-        throw new Error('User not found')
-      }
-      await Promise.all([
-        Event.updateMany(
-          { _id: { $in: userToDelete.events } },
-          { $pull: { organizer: userToDelete._id } }
-        ),
-        Order.updateMany({ _id: { $in: userToDelete.orders } }, { $unset: { buyer: 1 } }),
-      ])
-      const deletedUser = await User.findByIdAndDelete(userToDelete._id)
-      revalidatePath('/')
-  
-      return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null
-    } catch (error) {
-      handleError(error)
+  try {
+    await connectToDatabase();
+    const userToDelete = await User.findOne({ clerkId });
+
+    if (!userToDelete) {
+      throw new Error("User not found");
     }
+    await Promise.all([
+      Event.updateMany(
+        { _id: { $in: userToDelete.events } },
+        { $pull: { organizer: userToDelete._id } }
+      ),
+      Order.updateMany({ _id: { $in: userToDelete.orders } }, { $unset: { buyer: 1 } }),
+    ]);
+    const deletedUser = await User.findByIdAndDelete(userToDelete._id);
+    revalidatePath("/");
+
+    return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null;
+  } catch (error) {
+    handleError(error);
   }
-  
+}

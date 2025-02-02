@@ -1,11 +1,24 @@
-import EventForm from "@/components/shared/EventForm"
+import EventForm from "@/components/shared/EventForm";
 import { auth } from "@clerk/nextjs/server";
-
+import { redirect } from "next/navigation";
+import User from "@/lib/database/models/user.model";
+import { connectToDatabase } from "@/lib/database";
 
 const CreateEvent = async () => {
-  const { sessionClaims } = await auth();
+  const { userId } = await auth();
 
-  const userId = sessionClaims?.userId as string;
+  if (!userId) {
+    redirect("/sign-in");
+
+  }
+
+  await connectToDatabase();
+  const user = await User.findOne({ clerkId: userId });
+
+  if (!user) {
+    redirect("/sign-in");
+    return null;
+  }
 
   return (
     <>
@@ -14,10 +27,10 @@ const CreateEvent = async () => {
       </section>
 
       <div className="wrapper my-8">
-        <EventForm userId={userId} type="Create" />
+        <EventForm userId={user._id.toString()} type="Create" />
       </div>
     </>
-  )
-}
+  );
+};
 
-export default CreateEvent
+export default CreateEvent;

@@ -49,6 +49,7 @@ export async function POST(req: Request) {
         firstName: first_name || "",
         lastName: last_name || "",
         photo: image_url || "",
+        username: email_addresses?.[0]?.email_address.split('@')[0] || "", // Generate a default username
       };
 
       const newUser = await createUser(user);

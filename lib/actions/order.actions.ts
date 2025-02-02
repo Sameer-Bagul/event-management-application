@@ -9,6 +9,7 @@ import Order from '../database/models/order.model';
 import Event from '../database/models/event.model';
 import {ObjectId} from 'mongodb';
 import User from '../database/models/user.model';
+import mongoose from "mongoose";
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
 //   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -115,34 +116,46 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
     handleError(error)
   }
 }
-
-// GET ORDERS BY USER
-export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUserParams) {
+export async function getOrdersByUser({
+  userId,
+  limit = 3,
+  page,
+}: GetOrdersByUserParams) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const skipAmount = (Number(page) - 1) * limit
-    const conditions = { buyer: userId }
+    // Step 1: Check if userId is a valid ObjectId string
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error("Invalid userId: Cannot convert to ObjectId");
+    }
 
-    const orders = await Order.distinct('event._id')
-      .find(conditions)
+    // Step 2: Convert userId (Clerk ID string) to MongoDB ObjectId
+    const objectIdUser = new mongoose.Types.ObjectId(userId); // Convert string to ObjectId
+
+    // Step 3: Define query conditions using the ObjectId for the buyer field
+    const skipAmount = (Number(page) - 1) * limit;
+    const conditions = { buyer: objectIdUser }; // Use ObjectId for buyer field
+
+    // Step 4: Query orders and populate event details and organizer
+    const orders = await Order.find(conditions)  // Removed distinct() for better population support
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(limit)
       .populate({
-        path: 'event',
+        path: 'event',  // Populate the event field
         model: Event,
         populate: {
           path: 'organizer',
           model: User,
           select: '_id firstName lastName',
         },
-      })
+      });
 
-    const ordersCount = await Order.distinct('event._id').countDocuments(conditions)
+    // Step 5: Get the count of orders for pagination
+    const ordersCount = await Order.countDocuments(conditions);
 
-    return { data: JSON.parse(JSON.stringify(orders)), totalPages: Math.ceil(ordersCount / limit) }
+    return { data: JSON.parse(JSON.stringify(orders)), totalPages: Math.ceil(ordersCount / limit) };
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
