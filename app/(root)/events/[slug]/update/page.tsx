@@ -4,10 +4,11 @@ import { auth } from "@clerk/nextjs/server"
 
 
 type Params = Promise<{ slug: string }>
+
 const UpdateEvent = async ({ params}:{params: Params} ) => {
-  const { sessionClaims } = await auth();
+  const { userId } = await auth();
+  if(!userId) return { redirect: '/sign-in' }
   const { slug } = await params;
-  const userId = sessionClaims?.userId as string;
   const event = await getEventById(slug)
 
   return (

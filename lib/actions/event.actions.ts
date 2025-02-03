@@ -146,6 +146,16 @@ export async function getAllEvents({
   }
 }
 
+export async function isCreator(organizerId: string, userId: string) {
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId: userId });
+    return user?._id.toHexString() === organizerId;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 // GET EVENTS BY ORGANIZER
 export async function getEventsByUser({
   userId, // This is Clerk's userId (clerkId)
@@ -153,8 +163,6 @@ export async function getEventsByUser({
   page,
 }: GetEventsByUserParams) {
   try {
-    console.log('Received userId:', userId); // Log to verify the userId
-
     await connectToDatabase();
 
     // Query the database using clerkId (not clerkUserId)

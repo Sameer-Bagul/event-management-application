@@ -124,25 +124,19 @@ export async function getOrdersByUser({
   try {
     await connectToDatabase();
 
-    // Step 1: Check if userId is a valid ObjectId string
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       throw new Error("Invalid userId: Cannot convert to ObjectId");
     }
-
-    // Step 2: Convert userId (Clerk ID string) to MongoDB ObjectId
-    const objectIdUser = new mongoose.Types.ObjectId(userId); // Convert string to ObjectId
-
-    // Step 3: Define query conditions using the ObjectId for the buyer field
+    const objectIdUser = new mongoose.Types.ObjectId(userId); 
     const skipAmount = (Number(page) - 1) * limit;
-    const conditions = { buyer: objectIdUser }; // Use ObjectId for buyer field
+    const conditions = { buyer: objectIdUser }; 
 
-    // Step 4: Query orders and populate event details and organizer
-    const orders = await Order.find(conditions)  // Removed distinct() for better population support
+    const orders = await Order.find(conditions)  
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(limit)
       .populate({
-        path: 'event',  // Populate the event field
+        path: 'event', 
         model: Event,
         populate: {
           path: 'organizer',
@@ -151,7 +145,6 @@ export async function getOrdersByUser({
         },
       });
 
-    // Step 5: Get the count of orders for pagination
     const ordersCount = await Order.countDocuments(conditions);
 
     return { data: JSON.parse(JSON.stringify(orders)), totalPages: Math.ceil(ordersCount / limit) };

@@ -1,5 +1,4 @@
 "use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -15,7 +14,6 @@ import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
 import { useUploadThing } from '@/lib/uploadthing'
-
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "../ui/checkbox"
 import { useRouter } from "next/navigation"
@@ -39,8 +37,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       endDateTime: new Date(event.endDateTime) 
     }
     : eventDefaultValues;
-  const router = useRouter();
 
+  const router = useRouter();
   const { startUpload } = useUploadThing('imageUploader')
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -55,7 +53,6 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       if(!uploadedImages) {
         return
       }
-
       uploadedImageUrl = uploadedImages[0].url
     }
 
@@ -77,11 +74,15 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     }
 
     if(type === 'Update') {
+      console.log('update event')
+      console.log(eventId)
+      console.log(event)
+      console.log(userId)
+      console.log(values)
       if(!eventId) {
         router.back()
         return;
       }
-
       try {
         const updatedEvent = await updateEvent({
           userId,
@@ -100,14 +101,14 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
-        <div className="flex flex-col gap-5 md:flex-row">
+    <Form {...form} >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 bg-white dark:bg-gray-800 ">
+        <div className="flex flex-col gap-5 md:flex-row ">
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
-              <FormItem className="w-full">
+              <FormItem className="w-full" >
                 <FormControl>
                   <Input placeholder="Event title" {...field} className="input-field" />
                 </FormControl>
