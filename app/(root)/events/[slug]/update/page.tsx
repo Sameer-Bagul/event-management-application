@@ -10,7 +10,6 @@ const UpdateEvent = async ({ params}:{params: Params} ) => {
   if(!userId) return { redirect: '/sign-in' }
   const { slug } = await params;
   const event = await getEventById(slug)
-
   return (
     <>
       <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">

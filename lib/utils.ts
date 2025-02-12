@@ -44,8 +44,7 @@ export const formatDateTime = (dateString: string | Date) => {
     dateOnly: formattedDate,
     timeOnly: formattedTime,
   };
-};
-
+}; 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 
 export const formatPrice = (price: string) => {

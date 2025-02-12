@@ -75,9 +75,9 @@ export async function getEventById(eventId: string) {
 export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   try {
     await connectToDatabase();
-
+    const user = await User.findOne({ clerkId: userId });
     const eventToUpdate = await Event.findById(event._id);
-    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
+    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== user._id.toHexString()) {
       throw new Error("Unauthorized or event not found");
     }
 

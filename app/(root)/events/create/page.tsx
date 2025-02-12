@@ -17,7 +17,6 @@ const CreateEvent = async () => {
 
   if (!user) {
     redirect("/sign-in");
-    return null;
   }
 
   return (
