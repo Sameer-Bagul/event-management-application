@@ -1,0 +1,71 @@
+{
+  "_id": "portfolio-event-management-001",
+  "title": "Event Management Application",
+  "slug": "event-management-application",
+  "shortDescription": "A full-stack, modern event management and ticketing platform built to handle scheduling, organization, attendee tracking, and payments seamlessly.",
+  "description": "This Event Management Application is a comprehensive full-stack platform built with Next.js 15 App Router and React 19. It allows users to easily create, publish, and manage detailed events with dates, locations, and capacities. The application integrates secure authentication via Clerk, robust media management using Uploadthing, and secure ticket purchasing via Razorpay. Built on a serverless architecture, it utilizes Next.js Server Actions for end-to-end type-safe database operations with MongoDB, significantly reducing client-side JavaScript. The UI is designed with Tailwind CSS and Shadcn/UI, offering a clean, accessible, and responsive experience with full dark mode support.",
+  "category": "web-application",
+  "isFeatured": true,
+  "status": "Completed",
+  "role": "Full Stack Developer",
+  "clientOrCompany": "Personal Project",
+  "duration": "1 Month",
+  "targetAudience": "Event Organizers / Attendees",
+  "techStackBreakdown": {
+    "frontend": ["Next.js 15", "React 19", "Tailwind CSS", "Shadcn/UI", "Next Themes"],
+    "backend": ["Next.js Server Actions", "MongoDB", "Mongoose"],
+    "integrations": ["Clerk Auth", "Razorpay", "Uploadthing", "Svix Webhooks"]
+  },
+  "myContributions": [
+    "Architected the application using Next.js 15 App Router and React Server Components for optimal performance.",
+    "Designed and implemented the MongoDB database schema using Mongoose, establishing relationships between users, events, categories, and orders.",
+    "Integrated Clerk for secure user authentication and utilized Svix webhooks to seamlessly sync user data with the local database.",
+    "Implemented a secure checkout and ticketing flow using Razorpay API.",
+    "Configured Uploadthing for high-performance media uploads and hosting for event banners.",
+    "Built end-to-end type-safe Server Actions to handle complex database mutations without traditional REST APIs.",
+    "Crafted a modern, fully responsive UI with dark mode support using Tailwind CSS and Shadcn/UI."
+  ],
+  "image": "assets/screenshot.png",
+  "gallery": [
+    { "url": "assets/screenshot.png", "caption": "App Screenshot" }
+  ],
+  "architectureDiagram": "graph TD\n    Client[Client Browser]\n    \n    subgraph Frontend [Next.js App Router]\n        UI[React 19 Server/Client Components]\n        SA[Server Actions]\n    end\n\n    subgraph External Services\n        Clerk[Clerk Auth]\n        Razorpay[Razorpay Payments]\n        UploadThing[UploadThing CDN]\n        Svix[Svix Webhooks]\n    end\n\n    subgraph Backend Services\n        API[Next.js API Routes]\n        DB[(MongoDB Atlas)]\n    end\n\n    Client <--> UI\n    UI -->|Mutations/Data Fetching| SA\n    SA -->|Mongoose ORM| DB\n\n    Client -->|Login/Signup| Clerk\n    Clerk -->|Webhook Sync| Svix\n    Svix -->|POST /api/webhook/clerk| API\n    API -->|Create/Update User| DB\n\n    Client -->|Upload File| UploadThing\n    UploadThing -->|Returns URL| UI\n\n    Client -->|Checkout| Razorpay\n    Razorpay -->|Payment Confirm Webhook| API\n    API -->|Create Order| DB",
+  "liveUrl": "",
+  "githubUrl": "https://github.com/Sameer-Bagul/event-management-application",
+  "apiDocsUrl": "",
+  "contributors": ["Sameer Bagul"],
+  "features": [
+    "Comprehensive Event Tracking: Create, publish, and manage detailed events with dates, locations, and capacities.",
+    "Secure Authentication: Integrated Clerk Auth for a robust, secure, and customizable login experience.",
+    "Ticketing & Payments: Built-in Razorpay integration to handle secure ticket purchases and transactions.",
+    "Media Management: Seamless integration with Uploadthing for uploading and hosting high-quality event banners and media.",
+    "Webhook Syncing: Utilizes Svix for robust webhook handling (syncing Clerk users with the database).",
+    "Modern UI/UX: Clean, accessible, and responsive interface powered by Tailwind CSS and Shadcn/UI components.",
+    "Dark Mode Support: Full dark/light mode functionality using next-themes."
+  ],
+  "challenges": [
+    "Ensuring real-time webhook synchronization between Clerk and MongoDB via Svix without race conditions.",
+    "Managing complex relational data (Users, Events, Orders, Categories) within a NoSQL MongoDB structure using Mongoose.",
+    "Creating a seamless and secure payment flow utilizing Razorpay webhooks and Server Actions for order generation."
+  ],
+  "learnings": [
+    "Mastered Next.js 15 Server Actions for secure, type-safe database operations, reducing reliance on API routes.",
+    "Gained deep understanding of third-party integration architectures using webhooks for decoupled service communication.",
+    "Improved skills in building accessible and customizable UI components using Shadcn/UI and Tailwind."
+  ],
+  "metrics": [
+    "Significantly reduced client-side JavaScript bundle size by heavily leveraging React Server Components.",
+    "Achieved type safety across the entire stack using TypeScript, Next.js Server Actions, and Mongoose schemas."
+  ],
+  "clientTestimonial": {
+    "name": "Sameer Bagul",
+    "role": "Creator",
+    "quote": "Building this event management platform provided incredible insights into modern Next.js architectures, serverless integrations, and crafting seamless payment experiences."
+  },
+  "relatedBlogs": [],
+  "futureRoadmap": [
+    "Implement an advanced admin dashboard for global event tracking.",
+    "Add PDF ticket generation with QR codes for physical scanning.",
+    "Introduce email notifications and reminders for upcoming events."
+  ]
+}
